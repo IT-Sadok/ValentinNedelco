@@ -77,8 +77,21 @@ namespace LibraryApp.UI
             Console.Write("Enter author: ");
             string author = Console.ReadLine() ?? "";
 
-            Console.Write("Enter year: ");
-            int.TryParse(Console.ReadLine(), out int year);
+            int yearPublished;
+
+            while (true)
+            {
+                Console.Write("Enter publication year: ");
+
+                if (int.TryParse(Console.ReadLine(), out yearPublished)
+                    && yearPublished > 0
+                    && yearPublished <= DateTime.Now.Year)
+                {
+                    break;
+                }
+
+                Console.WriteLine("Invalid year.");
+            }
 
             Console.Write("Enter unique code: ");
             string code = Console.ReadLine() ?? "";
@@ -87,7 +100,7 @@ namespace LibraryApp.UI
             {
                 Title = title,
                 Author = author,
-                Year = year,
+                YearPublished = yearPublished,
                 Code = code
             };
 
@@ -162,7 +175,7 @@ namespace LibraryApp.UI
             foreach (Book book in books)
             {
                 Console.WriteLine(
-                    $"[{book.Code}] {book.Title} - {book.Author} ({book.Year}) | Status: {book.Status}");
+                    $"[{book.Code}] {book.Title} - {book.Author} ({book.YearPublished}) | Status: {book.Status}");
             }
         }
     }
