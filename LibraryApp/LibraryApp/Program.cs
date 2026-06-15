@@ -6,6 +6,10 @@ IBookRepository bookRepository = new JsonBookRepository("books.json");
 
 ILibraryService libraryService = new LibraryService(bookRepository);
 
-ConsoleMenu consoleMenu = new ConsoleMenu(libraryService);
+IBookSimulationService simulationService = new BookSimulationService(bookRepository);
 
-consoleMenu.Run();
+ConsoleMenu consoleMenu = new ConsoleMenu(
+    libraryService,
+    simulationService);
+
+await consoleMenu.RunAsync();

@@ -7,6 +7,8 @@ namespace LibraryApp.Services
     {
         private readonly IBookRepository _bookRepository;
 
+        private readonly object _lock = new();
+
         public LibraryService(IBookRepository bookRepository)
         {
             _bookRepository = bookRepository;
@@ -14,95 +16,113 @@ namespace LibraryApp.Services
 
         public bool AddBook(Book book)
         {
-            List<Book> books = _bookRepository.GetAllBooks();
-
-            var existingBook = books.FirstOrDefault(b =>
-                b.Code.Equals(book.Code, StringComparison.OrdinalIgnoreCase));
-
-            if (existingBook is not null)
+            lock (_lock)
             {
-                return false;
+                List<Book> books = _bookRepository.GetAllBooks();
+
+                var existingBook = books.FirstOrDefault(b =>
+                    b.Code.Equals(book.Code, StringComparison.OrdinalIgnoreCase));
+
+                if (existingBook is not null)
+                {
+                    return false;
+                }
+
+                books.Add(book);
+                _bookRepository.SaveAllBooks(books);
+
+                return true;
             }
-
-            books.Add(book);
-            _bookRepository.SaveAllBooks(books);
-
-            return true;
         }
 
         public bool RemoveBook(string code)
         {
-            List<Book> books = _bookRepository.GetAllBooks();
-
-            var book = books.FirstOrDefault(b =>
-                b.Code.Equals(code, StringComparison.OrdinalIgnoreCase));
-
-            if (book is null)
+            lock (_lock)
             {
-                return false;
+                List<Book> books = _bookRepository.GetAllBooks();
+
+                var book = books.FirstOrDefault(b =>
+                    b.Code.Equals(code, StringComparison.OrdinalIgnoreCase));
+
+                if (book is null)
+                {
+                    return false;
+                }
+
+                books.Remove(book);
+                _bookRepository.SaveAllBooks(books);
+
+                return true;
             }
-
-            books.Remove(book);
-            _bookRepository.SaveAllBooks(books);
-
-            return true;
         }
 
         public List<Book> SearchBooks(string searchParameter)
         {
-            List<Book> books = _bookRepository.GetAllBooks();
+            lock (_lock)
+            {
+                List<Book> books = _bookRepository.GetAllBooks();
 
-            return books
-                .Where(book =>
-                    book.Title.Contains(searchParameter, StringComparison.OrdinalIgnoreCase) ||
-                    book.Author.Contains(searchParameter, StringComparison.OrdinalIgnoreCase))
-                .ToList();
+                return books
+                    .Where(book =>
+                        book.Title.Contains(searchParameter, StringComparison.OrdinalIgnoreCase) ||
+                        book.Author.Contains(searchParameter, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
         }
 
         public List<Book> GetAllBooks()
         {
-            return _bookRepository
-                .GetAllBooks()
-                .OrderBy(book => book.Title)
-                .ToList();
+            lock (_lock)
+            {
+                return _bookRepository
+                    .GetAllBooks()
+                    .OrderBy(book => book.Title)
+                    .ToList();
+            }
         }
 
         public bool BorrowBook(string code)
         {
-            List<Book> books = _bookRepository.GetAllBooks();
-
-            var book = books.FirstOrDefault(b =>
-                b.Code.Equals(code, StringComparison.OrdinalIgnoreCase));
-
-            if (book is null || book.Status == BookStatus.Borrowed)
+            lock (_lock)
             {
-                return false;
+                List<Book> books = _bookRepository.GetAllBooks();
+
+                var book = books.FirstOrDefault(b =>
+                    b.Code.Equals(code, StringComparison.OrdinalIgnoreCase));
+
+                if (book is null || book.Status == BookStatus.Borrowed)
+                {
+                    return false;
+                }
+
+                book.Status = BookStatus.Borrowed;
+
+                _bookRepository.SaveAllBooks(books);
+
+                return true;
             }
-
-            book.Status = BookStatus.Borrowed;
-
-            _bookRepository.SaveAllBooks(books);
-
-            return true;
         }
 
         public bool ReturnBook(string code)
         {
-            List<Book> books = _bookRepository.GetAllBooks();
-
-            var book = books.FirstOrDefault(b =>
-                b.Code.Equals(code, StringComparison.OrdinalIgnoreCase));
-
-            if (book is null || book.Status == BookStatus.Available)
+            lock (_lock)
             {
-                return false;
+                List<Book> books = _bookRepository.GetAllBooks();
+
+                var book = books.FirstOrDefault(b =>
+                    b.Code.Equals(code, StringComparison.OrdinalIgnoreCase));
+
+                if (book is null || book.Status == BookStatus.Available)
+                {
+                    return false;
+                }
+
+                book.Status = BookStatus.Available;
+
+                _bookRepository.SaveAllBooks(books);
+
+                return true;
             }
-
-            book.Status = BookStatus.Available;
-
-            _bookRepository.SaveAllBooks(books);
-
-            return true;
         }
     }
 }

@@ -6,13 +6,17 @@ namespace LibraryApp.UI
     public class ConsoleMenu
     {
         private readonly ILibraryService _libraryService;
+        private readonly IBookSimulationService _simulationService;
 
-        public ConsoleMenu(ILibraryService libraryService)
+        public ConsoleMenu(
+            ILibraryService libraryService,
+            IBookSimulationService simulationService)
         {
             _libraryService = libraryService;
+            _simulationService = simulationService;
         }
 
-        public void Run()
+        public async Task RunAsync()
         {
             while (true)
             {
@@ -46,6 +50,10 @@ namespace LibraryApp.UI
                         ReturnBook();
                         break;
 
+                    case "7":
+                        await RunSimulationAsync();
+                        break;
+
                     case "0":
                         return;
 
@@ -65,6 +73,7 @@ namespace LibraryApp.UI
             Console.WriteLine("4. Show All Books");
             Console.WriteLine("5. Borrow Book");
             Console.WriteLine("6. Return Book");
+            Console.WriteLine("7. Run 100 Tasks Simulation");
             Console.WriteLine("0. Exit");
             Console.Write("Choose an option: ");
         }
@@ -177,6 +186,11 @@ namespace LibraryApp.UI
                 Console.WriteLine(
                     $"[{book.Code}] {book.Title} - {book.Author} ({book.YearPublished}) | Status: {book.Status}");
             }
+        }
+
+        private async Task RunSimulationAsync()
+        {
+            await _simulationService.RunSimulationAsync();
         }
     }
 }
