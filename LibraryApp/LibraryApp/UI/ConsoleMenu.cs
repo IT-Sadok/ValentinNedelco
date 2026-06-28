@@ -81,10 +81,10 @@ namespace LibraryApp.UI
         private void AddBook()
         {
             Console.Write("Enter title: ");
-            string title = Console.ReadLine() ?? "";
+            string title = Console.ReadLine() ?? string.Empty;
 
             Console.Write("Enter author: ");
-            string author = Console.ReadLine() ?? "";
+            string author = Console.ReadLine() ?? string.Empty;
 
             int yearPublished;
 
@@ -103,7 +103,7 @@ namespace LibraryApp.UI
             }
 
             Console.Write("Enter unique code: ");
-            string code = Console.ReadLine() ?? "";
+            string code = Console.ReadLine() ?? string.Empty;
 
             Book book = new Book
             {
@@ -123,7 +123,7 @@ namespace LibraryApp.UI
         private void RemoveBook()
         {
             Console.Write("Enter book code: ");
-            string code = Console.ReadLine() ?? "";
+            string code = Console.ReadLine() ?? string.Empty;
 
             bool isRemoved = _libraryService.RemoveBook(code);
 
@@ -135,7 +135,7 @@ namespace LibraryApp.UI
         private void SearchBooks()
         {
             Console.Write("Enter title or author: ");
-            string searchParameter = Console.ReadLine() ?? "";
+            string searchParameter = Console.ReadLine() ?? string.Empty;
 
             List<Book> books = _libraryService.SearchBooks(searchParameter);
 
@@ -152,7 +152,7 @@ namespace LibraryApp.UI
         private void BorrowBook()
         {
             Console.Write("Enter book code: ");
-            string code = Console.ReadLine() ?? "";
+            string code = Console.ReadLine() ?? string.Empty;
 
             bool isBorrowed = _libraryService.BorrowBook(code);
 
@@ -164,7 +164,7 @@ namespace LibraryApp.UI
         private void ReturnBook()
         {
             Console.Write("Enter book code: ");
-            string code = Console.ReadLine() ?? "";
+            string code = Console.ReadLine() ?? string.Empty;
 
             bool isReturned = _libraryService.ReturnBook(code);
 
