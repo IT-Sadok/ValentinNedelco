@@ -58,27 +58,21 @@ namespace LibraryApp.Services
 
         public List<Book> SearchBooks(string searchParameter)
         {
-            lock (_lock)
-            {
-                List<Book> books = _bookRepository.GetAllBooks();
-
-                return books
-                    .Where(book =>
-                        book.Title.Contains(searchParameter, StringComparison.OrdinalIgnoreCase) ||
-                        book.Author.Contains(searchParameter, StringComparison.OrdinalIgnoreCase))
-                    .ToList();
-            }
+            List<Book> books = _bookRepository.GetAllBooks();
+            
+            return books
+                .Where(book =>
+                    book.Title.Contains(searchParameter, StringComparison.OrdinalIgnoreCase) ||
+                    book.Author.Contains(searchParameter, StringComparison.OrdinalIgnoreCase))
+                .ToList();
         }
 
         public List<Book> GetAllBooks()
         {
-            lock (_lock)
-            {
-                return _bookRepository
-                    .GetAllBooks()
-                    .OrderBy(book => book.Title)
-                    .ToList();
-            }
+            return _bookRepository
+                .GetAllBooks()
+                .OrderBy(book => book.Title)
+                .ToList();
         }
 
         public bool BorrowBook(string code)
